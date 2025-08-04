@@ -1,13 +1,13 @@
 from __future__ import annotations
+
 from datetime import datetime, timedelta
-from typing import TYPE_CHECKING, Any, List
+from typing import TYPE_CHECKING
 
-
+from homeassistant.components.calendar import CalendarEntity, CalendarEvent
 
 if TYPE_CHECKING:
     from homeassistant.core import HomeAssistant
     from homeassistant.helpers.entity_platform import AddEntitiesCallback
-    from homeassistant.components.calendar import CalendarEntity, CalendarEvent 
 
     from .coordinator import GreyhoundDataUpdateCoordinator
     from .data import GreyhoundConfigEntry
@@ -39,10 +39,24 @@ class GreyhoundBinCalendar(CalendarEntity):
 
         for event in events:
             event_date = event.get("date")
-            if not isinstance(event_date, datetime):
-                event_date = datetime.combine(event_date, datetime.min.time())
-            if event_date.date() >= now:
-                summary = f"Bin Collection: {', '.join(event.get('bins', []))}"
+            if isinstance(event_date, datetime):
+                event_date = event_date.date()
+
+            if event_date >= now:
+                bins = event.get("bins", [])
+                # Format bins with colored squares
+                bin_labels = []
+                if "GREEN" in bins:
+                    bin_labels.append("🟩 Green Bin")
+                else:
+                    bin_labels.append("🟫⬛ Brown & Black Bins")
+                # Add any other bin types here as needed
+
+                summary = (
+                    f"Bin Collection: {', '.join(bin_labels)}"
+                    if bin_labels
+                    else "Bin Collection"
+                )
                 return CalendarEvent(
                     summary=summary,
                     start=event_date,
@@ -50,7 +64,7 @@ class GreyhoundBinCalendar(CalendarEntity):
                 )
 
         return None
-    
+
     async def async_get_events(
         self,
         hass: HomeAssistant,
@@ -59,12 +73,32 @@ class GreyhoundBinCalendar(CalendarEntity):
     ) -> list[CalendarEvent]:
         """Return calendar events between start and end."""
         events = self.coordinator.data.get("events", [])
-        return [
-            CalendarEvent(
-                summary=f"Bin Collection: {', '.join(event.get('bins', []))}",
-                start=datetime.combine(event["date"], datetime.min.time()),
-                end=datetime.combine(event["date"], datetime.min.time()) + timedelta(days=1),
-            )
-            for event in events
-            if start_date.date() <= event["date"] <= end_date.date()
-        ]
+        result = []
+
+        for event in events:
+            date = event["date"]
+            if isinstance(date, datetime):
+                date = date.date()
+
+            if start_date.date() <= date < end_date.date():
+                bins = event.get("bins", [])
+                bin_labels = []
+                if "GREEN" in bins:
+                    bin_labels.append("🟩 Green Bin")
+                else:
+                    bin_labels.append("🟫⬛ Brown & Black Bins")
+
+                summary = (
+                    f"Bin Collection: {', '.join(bin_labels)}"
+                    if bin_labels
+                    else "Bin Collection"
+                )
+
+                result.append(
+                    CalendarEvent(
+                        summary=summary,
+                        start=date,
+                        end=date + timedelta(days=1),
+                    )
+                )
+        return result

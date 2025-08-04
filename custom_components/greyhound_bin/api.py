@@ -1,22 +1,24 @@
 import asyncio
+from datetime import datetime, timedelta
 import html
 import json
 import logging
 import re
-from datetime import datetime, timedelta
 import socket
-from typing import List, Dict, Any, Optional
+from typing import Any, Dict, Optional
 
-from aiohttp import ClientError, ClientSession,ClientResponse
+from aiohttp import ClientError, ClientResponse, ClientSession
 import async_timeout
 from bs4 import BeautifulSoup, Tag
 
-from greyhound_bin.custom_components.greyhound_bin.const import LOGIN_URL, CALENDAR_URL
+from .const import CALENDAR_URL, LOGIN_URL
 
 _LOGGER = logging.getLogger(__name__)
 
+
 class GreyhoundAPIError(Exception):
     """Exception raised for errors in the Greyhound API."""
+
 
 class GreyhoundAPICommunicationError(GreyhoundAPIError):
     """Communication error with the API."""
@@ -25,14 +27,13 @@ class GreyhoundAPICommunicationError(GreyhoundAPIError):
 class GreyhoundApiClient:
     """Client to interact with the Greyhound bin collection API."""
 
-    def __init__(self, username: str, pin: str, session: ClientSession) -> None:
+    def __init__(self, accountnumber: str, pin: str, session: ClientSession) -> None:
         """Initialize the client."""
-        self.username = username
+        self.accountnumber = accountnumber
         self.pin = pin
         self._session = session
-        self.logged_in = False    
-        
-        
+        self.logged_in = False
+
     async def _api_wrapper(
         self,
         method: str,
@@ -65,7 +66,7 @@ class GreyhoundApiClient:
         except Exception as exception:
             msg = f"Unexpected error - {exception}"
             raise GreyhoundAPIError(msg) from exception
-        
+
     @staticmethod
     def _verify_response_or_raise(response: ClientResponse) -> None:
         """Verify HTTP response or raise error."""
@@ -81,27 +82,39 @@ class GreyhoundApiClient:
 
             if not token_input or not isinstance(token_input, Tag):
                 raise GreyhoundAPIError("CSRF token input not found or not a Tag")
-            
+
             csrf_token = token_input.get("value")
-            
+
             if not csrf_token:
                 raise GreyhoundAPIError("CSRF token missing 'value' attribute")
 
-            csrf_token = token_input["value"] 
-            
+            csrf_token = token_input["value"]
+
             login_data = {
                 "csrfmiddlewaretoken": csrf_token,
-                "customerNo": self.username,
+                "customerNo": self.accountnumber,
                 "pinCode": self.pin,
             }
-            headers = {"Referer": LOGIN_URL}
 
-            login_resp = await self._session.post(LOGIN_URL, data=login_data, headers=headers)
+            headers = {
+                "Referer": LOGIN_URL,
+                "User-Agent": "Mozilla/5.0",
+                "Content-Type": "application/x-www-form-urlencoded",
+            }
 
-            if login_resp.status != 302:
-                raise GreyhoundAPIError("Login failed: Invalid credentials.")
+            login_resp = await self._session.post(
+                LOGIN_URL, data=login_data, headers=headers
+            )
 
-            _LOGGER.debug("Login successful for user %s", self.username)
+            login_text = await login_resp.text()
+
+            if "Dashboard" not in login_text and "Logout" not in login_text:
+                _LOGGER.error("Login failed. 'Logout' not found in response body.")
+                raise GreyhoundAPIError(
+                    "Login failed: Possibly invalid credentials or unexpected response."
+                )
+
+            _LOGGER.debug("Login successful for user %s", self.accountnumber)
             self.logged_in = True
 
         except ClientError as err:
@@ -150,15 +163,19 @@ class GreyhoundApiClient:
                 continue
 
             if today <= event_date <= cutoff:
-                waste_types = [b["waste_types"][0] for b in bins if b.get("waste_types")]
-                events.append({
-                    "date": event_date,
-                    "bins": waste_types,
-                })
+                waste_types = [
+                    b["waste_types"][0] for b in bins if b.get("waste_types")
+                ]
+                events.append(
+                    {
+                        "date": event_date,
+                        "bins": waste_types,
+                    }
+                )
 
         _LOGGER.info("Fetched %d bin collection events", len(events))
-        
-         # Build summary sensor data
+
+        # Build summary sensor data
         summary: dict[str, Any] = {}
         if events:
             next_event = events[0]  # assume sorted by date
@@ -169,19 +186,14 @@ class GreyhoundApiClient:
                 "bin_types": ", ".join(next_event["bins"]),
                 "days_until_collection": days_until,
                 "collection_status": (
-                    "Today" if days_until == 0 else
-                    "Tomorrow" if days_until == 1 else
-                    f"In {days_until} days"
+                    "Today"
+                    if days_until == 0
+                    else "Tomorrow" if days_until == 1 else f"In {days_until} days"
                 ),
-                "service_disruption": next_event["cancelled"],
+                # "service_disruption": next_event["cancelled"],
             }
 
         return {
-            "events": events,     # calendar uses this
-            "sensors": summary,   # sensors use this
+            "events": events,  # calendar uses this
+            "sensors": summary,  # sensors use this
         }
-        
-
-
-        
-    

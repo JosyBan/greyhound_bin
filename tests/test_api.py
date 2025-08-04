@@ -1,11 +1,11 @@
 """Tests for greyhound_bin api."""
+
 import asyncio
 
 import aiohttp
-from custom_components.greyhound_bin.api import (
-    GreyhoundbinApiClient,
-)
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
+
+from custom_components.greyhound_bin.api import GreyhoundbinApiClient
 
 
 async def test_api(hass, aioclient_mock, caplog):

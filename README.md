@@ -14,52 +14,54 @@
 [![Discord][discord-shield]][discord]
 [![Community Forum][forum-shield]][forum]
 
-**TO BE REMOVED: If you need help, as a developer, to use this custom component tempalte,
-please look at the [User Guide in the Cookiecutter documentation](https://cookiecutter-homeassistant-custom-component.readthedocs.io/en/stable/quickstart.html)**
+This custom component integrates Greyhound Bin App API with [Home Assistant][ha], it will add a new local calendar allowing you to monitor your Bin collections for the next 30 days. There are a few extra sensors, e.g. - next collection date, next collection bin type.
 
 **This component will set up the following platforms.**
 
-| Platform        | Description                                                               |
-| --------------- | ------------------------------------------------------------------------- |
-| `binary_sensor` | Show something `True` or `False`.                                         |
-| `sensor`        | Show info from greyhound_bin API. |
-| `switch`        | Switch something `True` or `False`.                                       |
+| Platform   | Description                                      |
+| ---------- | ------------------------------------------------ |
+| `sensor`   | Displays information from the greyhound_bin API. |
+| `calendar` | Shows upcoming bin collection events.            |
 
 ![example][exampleimg]
 
-## Installation
+## HACS Installation
 
-1. Using the tool of choice open the directory (folder) for your HA configuration (where you find `configuration.yaml`).
-2. If you do not have a `custom_components` directory (folder) there, you need to create it.
-3. In the `custom_components` directory (folder) create a new folder called `greyhound_bin`.
-4. Download _all_ the files from the `custom_components/greyhound_bin/` directory (folder) in this repository.
-5. Place the files you downloaded in the new directory (folder) you created.
-6. Restart Home Assistant
-7. In the HA UI go to "Configuration" -> "Integrations" click "+" and search for "greyhound_bin"
+This is the recommended way to install.
 
-Using your HA configuration directory (folder) as a starting point you should now also have this:
+1. Open [HACS][hacs] in your Home Assistant UI
+2. Click on the three dots in the top right corner and select Custom repositories.
+3. In the "Add custom repository" field, paste https://github.com/JosyBan/ventaxia_ha.
+4. Select Integration as the Category.
+5. Click ADD
+6. Once added, search for "ventaxia" in the HACS Integrations section.
+7. Click on the "ventaxia" integration.
+8. Click Download and confirm.
+9. Restart Home Assistant.
+10. In the HA UI, click Settings in the left nav bar, then click "Devices & Services". By default you should be viewing the Integrations tab. Click "+ Add Integration" button at bottom right and then search for "ventaxia".
 
-```text
-custom_components/greyhound_bin/translations/en.json
-custom_components/greyhound_bin/translations/fr.json
-custom_components/greyhound_bin/translations/nb.json
-custom_components/greyhound_bin/translations/sensor.en.json
-custom_components/greyhound_bin/translations/sensor.fr.json
-custom_components/greyhound_bin/translations/sensor.nb.json
-custom_components/greyhound_bin/translations/sensor.nb.json
-custom_components/greyhound_bin/__init__.py
-custom_components/greyhound_bin/api.py
-custom_components/greyhound_bin/binary_sensor.py
-custom_components/greyhound_bin/config_flow.py
-custom_components/greyhound_bin/const.py
-custom_components/greyhound_bin/manifest.json
-custom_components/greyhound_bin/sensor.py
-custom_components/greyhound_bin/switch.py
-```
+## Manual Installation
 
-## Configuration is done in the UI
+1. Download the integration: Download the latest release from the [Release Page][ventaxia-releases].
+2. Unpack the ventaxia_ha folder from the downloaded archive.
+3. Copy the entire ventaxia_ha folder into your Home Assistant's custom_components directory. If this directory doesn't exist, you'll need to create it.
+4. Your Home Assistant configuration directory typically resides at /config (e.g., /config/custom_components/ventaxia_ha/).
+5. Restart Home Assistant.
+6. In the HA UI, click Settings in the left nav bar, then click "Devices & Services". By default you should be viewing the Integrations tab. Click "+ Add Integration" button at bottom right and then search for "ventaxia".
 
-<!---->
+## Configuration
+
+After installation and restarting Home Assistant, you can configure the Greyhound Bin integration via the Home Assistant UI.
+
+    Go to Settings > Devices & Services.
+
+    Click on ADD INTEGRATION.
+
+    Search for "Greyhound Bin" and select it.
+
+    Follow the on-screen prompts to enter your Greyhound Bin account details
+
+Once successfully configured, the integration will automatically create the calendar and relevant sensor entities. You can find the full list of available entities under Settings > Devices & Services > Greyhound Bin integration once it's set up.
 
 ## Contributions are welcome!
 

@@ -2,11 +2,16 @@
 
 from __future__ import annotations
 
+from datetime import datetime
 from typing import TYPE_CHECKING
 
-from homeassistant.components.sensor import SensorEntity, SensorEntityDescription,SensorDeviceClass
+from homeassistant.components.sensor import (
+    SensorDeviceClass,
+    SensorEntity,
+    SensorEntityDescription,
+)
 
-from .entity import GreyhoundBinEntity  
+from .entity import GreyhoundBinEntity
 
 if TYPE_CHECKING:
     from homeassistant.core import HomeAssistant
@@ -73,16 +78,34 @@ class GreyhoundBinSensor(GreyhoundBinEntity, SensorEntity):
         super().__init__(coordinator)
         self.entity_description = entity_description
         self._attr_should_poll = False
+        self._attr_unique_id = (
+            f"{coordinator.config_entry.entry_id}_{entity_description.key}"
+        )
+
+        if entity_description.key == "days_until_collection":
+            self._attr_native_unit_of_measurement = "d"
 
     @property
-    def native_value(self) -> str | None: # type: ignore
+    def native_value(self) -> str | int | datetime.date | None:  # type: ignore Updated return type
         """Return the native value of the sensor."""
         if not self.coordinator.data:
             return None
-        return self.coordinator.data.get("sensors", {}).get(self.entity_description.key)
 
-    
+        value = self.coordinator.data.get("sensors", {}).get(
+            self.entity_description.key
+        )
+
+        if self.entity_description.key == "next_collection_date":
+            if isinstance(value, str):
+                try:
+                    return datetime.strptime(value, "%Y-%m-%d").date()
+                except ValueError:
+                    return None
+            return value  # already a date
+
+        return value
+
     @property
-    def available(self) -> bool: # type: ignore
+    def available(self) -> bool:  # type: ignore
         """Return True if entity data is available."""
         return self.coordinator.last_update_success

@@ -1,16 +1,11 @@
 import logging
-from datetime import timedelta
 from typing import Any
 
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
-from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.exceptions import ConfigEntryAuthFailed
+from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
-from greyhound_bin.custom_components.greyhound_bin.data import GreyhoundConfigEntry
-
-from .api import GreyhoundAPICommunicationError, GreyhoundApiClient, GreyhoundAPIError
-from .const import DOMAIN, UPDATE_INTERVAL_DAYS
+from .api import GreyhoundAPICommunicationError, GreyhoundAPIError
+from .data import GreyhoundConfigEntry
 
 _LOGGER = logging.getLogger(__name__)
 

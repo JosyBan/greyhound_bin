@@ -1,4 +1,5 @@
 """Global fixtures for greyhound_bin integration."""
+
 from unittest.mock import patch
 
 import pytest
