@@ -31,7 +31,7 @@ This is the recommended way to install.
 
 1. Open [HACS][hacs] in your Home Assistant UI
 2. Click on the three dots in the top right corner and select Custom repositories.
-3. In the "Add custom repository" field, paste https://github.com/JosyBan/ventaxia_ha.
+3. In the "Add custom repository" field, paste https://github.com/JosyBan/greyhound_bin.
 4. Select Integration as the Category.
 5. Click ADD
 6. Once added, search for "ventaxia" in the HACS Integrations section.
@@ -42,7 +42,7 @@ This is the recommended way to install.
 
 ## Manual Installation
 
-1. Download the integration: Download the latest release from the [Release Page][ventaxia-releases].
+1. Download the integration: Download the latest release from the [Release Page][releases].
 2. Unpack the ventaxia_ha folder from the downloaded archive.
 3. Copy the entire ventaxia_ha folder into your Home Assistant's custom_components directory. If this directory doesn't exist, you'll need to create it.
 4. Your Home Assistant configuration directory typically resides at /config (e.g., /config/custom_components/ventaxia_ha/).
@@ -96,3 +96,4 @@ Code template was mainly taken from [@Ludeeus](https://github.com/ludeeus)'s [in
 [releases-shield]: https://img.shields.io/github/release/JosyBan/greyhound_bin.svg?style=for-the-badge
 [releases]: https://github.com/JosyBan/greyhound_bin/releases
 [user_profile]: https://github.com/JosyBan
+[greyhound_bin]: https://github.com/JosyBan/greyhound_bin
