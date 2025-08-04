@@ -1,0 +1,21 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Connect to Greyhound.ie Bin App",
+        "description": "Enter your Greyhound account details to fetch bin collection data.",
+        "data": {
+          "username": "Account Number",
+          "pin": "PIN Code"
+        }
+      }
+    },
+    "error": {
+      "invalid_auth": "Invalid account number or PIN",
+      "unknown": "Unexpected error occurred"
+    },
+    "abort": {
+      "already_configured": "This Greyhound account is already set up."
+    }
+  }
+}

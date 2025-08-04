@@ -1,0 +1,21 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Conectar con Greyhound Bin",
+        "description": "Introduce los datos de tu cuenta de Greyhound para obtener la información de recolección de residuos.",
+        "data": {
+          "username": "Número de cuenta",
+          "pin": "Código PIN"
+        }
+      }
+    },
+    "error": {
+      "invalid_auth": "Número de cuenta o PIN no válidos",
+      "unknown": "Ocurrió un error inesperado"
+    },
+    "abort": {
+      "already_configured": "Esta cuenta de Greyhound ya está configurada."
+    }
+  }
+}
