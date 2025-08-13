@@ -50,13 +50,11 @@ ENTITY_DESCRIPTIONS = (
         name="Service Disruption Alert",
         icon="mdi:alert-circle",
     ),
-        SensorEntityDescription(
+    SensorEntityDescription(
         key="next_bin_collections",
         name="Bin Collections",
         icon="mdi:trash-can-outline",
     ),
-    
-    
 )
 
 
@@ -120,18 +118,20 @@ class GreyhoundBinSensor(GreyhoundBinEntity, SensorEntity):
     def available(self) -> bool:  # type: ignore
         """Return True if entity data is available."""
         return self.coordinator.last_update_success
-    
+
     @property
-    def extra_state_attributes(self): # type: ignore
+    def extra_state_attributes(self):  # type: ignore
         """Return the next collection date per bin type."""
-        
-        if self.entity_description.key == "next_bin_collections":        
+
+        if self.entity_description.key == "next_bin_collections":
             events = self.coordinator.data.get("events", [])
             next_dates = {}
 
             for event in sorted(events, key=lambda e: e["date"]):
                 for bin_type in event.get("bins", []):
                     if BIN_DESCRIPTIONS[bin_type] not in next_dates:
-                        next_dates[BIN_DESCRIPTIONS[bin_type]] = event["date"].isoformat()
+                        next_dates[BIN_DESCRIPTIONS[bin_type]] = event[
+                            "date"
+                        ].isoformat()
 
             return next_dates
