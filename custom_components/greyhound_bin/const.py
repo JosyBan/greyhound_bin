@@ -5,7 +5,7 @@ from logging import Logger, getLogger
 # Base component constants
 DOMAIN = "greyhound_bin"
 
-ATTRIBUTION = "Data provided by http://jsonplaceholder.typicode.com/"
+ATTRIBUTION = "Data provided by Greyhound Bin Collection Service"
 ISSUE_URL = "https://github.com/JosyBan/greyhound_bin/issues"
 
 
@@ -23,3 +23,9 @@ CALENDAR_URL = "https://app.greyhound.ie/collection/collection_calendar"
 
 
 UPDATE_INTERVAL_DAYS = 1
+
+BIN_DESCRIPTIONS = {
+    "BLACK": "General waste",
+    "BROWN": "Organic waste",
+    "GREEN": "Recycle waste",
+}

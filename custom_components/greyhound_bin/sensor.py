@@ -11,6 +11,8 @@ from homeassistant.components.sensor import (
     SensorEntityDescription,
 )
 
+from custom_components.greyhound_bin.const import BIN_DESCRIPTIONS
+
 from .entity import GreyhoundBinEntity
 
 if TYPE_CHECKING:
@@ -48,6 +50,13 @@ ENTITY_DESCRIPTIONS = (
         name="Service Disruption Alert",
         icon="mdi:alert-circle",
     ),
+        SensorEntityDescription(
+        key="next_bin_collections",
+        name="Bin Collections",
+        icon="mdi:trash-can-outline",
+    ),
+    
+    
 )
 
 
@@ -84,6 +93,8 @@ class GreyhoundBinSensor(GreyhoundBinEntity, SensorEntity):
 
         if entity_description.key == "days_until_collection":
             self._attr_native_unit_of_measurement = "d"
+        elif entity_description.key == "next_bin_collections":
+            self._attr_native_value = None
 
     @property
     def native_value(self) -> str | int | datetime.date | None:  # type: ignore Updated return type
@@ -109,3 +120,18 @@ class GreyhoundBinSensor(GreyhoundBinEntity, SensorEntity):
     def available(self) -> bool:  # type: ignore
         """Return True if entity data is available."""
         return self.coordinator.last_update_success
+    
+    @property
+    def extra_state_attributes(self): # type: ignore
+        """Return the next collection date per bin type."""
+        
+        if self.entity_description.key == "next_bin_collections":        
+            events = self.coordinator.data.get("events", [])
+            next_dates = {}
+
+            for event in sorted(events, key=lambda e: e["date"]):
+                for bin_type in event.get("bins", []):
+                    if BIN_DESCRIPTIONS[bin_type] not in next_dates:
+                        next_dates[BIN_DESCRIPTIONS[bin_type]] = event["date"].isoformat()
+
+            return next_dates
