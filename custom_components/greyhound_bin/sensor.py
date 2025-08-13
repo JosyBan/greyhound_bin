@@ -134,4 +134,4 @@ class GreyhoundBinSensor(GreyhoundBinEntity, SensorEntity):
                             "date"
                         ].isoformat()
 
-            return next_dates
+            return {"next_bin_collections": next_dates}
