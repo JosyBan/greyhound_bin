@@ -10,11 +10,13 @@ jobs:
   labeler:
     name: Labeler
     runs-on: ubuntu-latest
+    permissions: # <--- ADD THIS SECTION!
+      issues: write # <--- This grants write access to issues, including labels
     steps:
       - name: Check out the repository
-        uses: actions/checkout@v2.3.4
+        uses: actions/checkout@v4
 
       - name: Run Labeler
-        uses: crazy-max/ghaction-github-labeler@v3.1.1
+        uses: crazy-max/ghaction-github-labeler@v5
         with:
           skip-delete: true
