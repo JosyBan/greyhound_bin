@@ -29,7 +29,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: GreyhoundConfigEntry) ->
         hass=hass,
         logger=LOGGER,
         name=DOMAIN,
-        update_interval=timedelta(hours=UPDATE_INTERVAL_HOURS),        
+        update_interval=timedelta(hours=UPDATE_INTERVAL_HOURS),
     )
     entry.runtime_data = GreyhoundData(
         client=GreyhoundApiClient(
