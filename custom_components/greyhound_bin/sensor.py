@@ -123,6 +123,7 @@ class GreyhoundBinSensor(GreyhoundBinEntity, SensorEntity):
     def extra_state_attributes(self):  # type: ignore
         """Return the next collection date per bin type."""
 
+        # Case 1: next_bin_collections → dictionary of bin type friendly names and dates
         if self.entity_description.key == "next_bin_collections":
             events = self.coordinator.data.get("events", [])
             next_dates = {}
@@ -135,3 +136,14 @@ class GreyhoundBinSensor(GreyhoundBinEntity, SensorEntity):
                         ].isoformat()
 
             return {"next_bin_collections": next_dates}
+
+        # Case 2: bin_types → add bin_types_friendly attribute
+        if self.entity_description.key == "bin_types":
+            return {
+                "bin_types_friendly": self.coordinator.data.get("sensors", {}).get(
+                    "bin_types_friendly"
+                )
+            }
+
+        # All other sensors → no extra attributes
+        return None
