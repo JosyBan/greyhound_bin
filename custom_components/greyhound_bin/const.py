@@ -22,7 +22,7 @@ LOGIN_URL = "https://app.greyhound.ie/"
 CALENDAR_URL = "https://app.greyhound.ie/collection/collection_calendar"
 
 
-UPDATE_INTERVAL_DAYS = 1
+UPDATE_INTERVAL_HOURS = 3
 
 BIN_DESCRIPTIONS = {
     "BLACK": "General waste",

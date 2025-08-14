@@ -12,7 +12,7 @@ from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.loader import async_get_loaded_integration
 
 from .api import GreyhoundApiClient
-from .const import CONF_ACCNO, CONF_PIN, DOMAIN, LOGGER, UPDATE_INTERVAL_DAYS
+from .const import CONF_ACCNO, CONF_PIN, DOMAIN, LOGGER, UPDATE_INTERVAL_HOURS
 from .coordinator import GreyhoundDataUpdateCoordinator
 from .data import GreyhoundData
 
@@ -29,7 +29,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: GreyhoundConfigEntry) ->
         hass=hass,
         logger=LOGGER,
         name=DOMAIN,
-        update_interval=timedelta(days=UPDATE_INTERVAL_DAYS),
+        update_interval=timedelta(hours=UPDATE_INTERVAL_HOURS),        
     )
     entry.runtime_data = GreyhoundData(
         client=GreyhoundApiClient(
