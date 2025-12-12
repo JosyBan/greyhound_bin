@@ -29,3 +29,10 @@ BIN_DESCRIPTIONS = {
     "BROWN": "Organic waste",
     "GREEN": "Recycle waste",
 }
+
+
+BIN_ORDER = {
+    "BLACK": 0,
+    "BROWN": 1,
+    "GREEN": 2,   
+}
