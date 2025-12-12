@@ -11,7 +11,7 @@ from aiohttp import ClientError, ClientResponse, ClientSession
 import async_timeout
 from bs4 import BeautifulSoup, Tag
 
-from .const import BIN_DESCRIPTIONS, CALENDAR_URL, LOGIN_URL, BIN_ORDER
+from .const import BIN_DESCRIPTIONS, BIN_ORDER, CALENDAR_URL, LOGIN_URL
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -181,8 +181,10 @@ class GreyhoundApiClient:
             next_event = events[0]  # assume sorted by date
             days_until = (next_event["date"] - today).days
 
-            ordered_bins = sorted(next_event["bins"], key=lambda b: BIN_ORDER.get(b, 999))            
-            
+            ordered_bins = sorted(
+                next_event["bins"], key=lambda b: BIN_ORDER.get(b, 999)
+            )
+
             summary = {
                 "next_collection_date": next_event["date"].isoformat(),
                 "bin_types": ", ".join(ordered_bins),

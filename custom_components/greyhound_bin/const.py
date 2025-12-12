@@ -34,5 +34,5 @@ BIN_DESCRIPTIONS = {
 BIN_ORDER = {
     "BLACK": 0,
     "BROWN": 1,
-    "GREEN": 2,   
+    "GREEN": 2,
 }
