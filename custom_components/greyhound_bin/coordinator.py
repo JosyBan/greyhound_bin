@@ -20,6 +20,6 @@ class GreyhoundDataUpdateCoordinator(DataUpdateCoordinator):
         try:
             return await self.config_entry.runtime_data.client.async_get_data()
         except GreyhoundAPICommunicationError as err:
-            raise ConfigEntryAuthFailed(err) from err
+            raise UpdateFailed(err) from err
         except GreyhoundAPIError as err:
             raise UpdateFailed(err) from err

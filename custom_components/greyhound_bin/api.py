@@ -19,9 +19,11 @@ _LOGGER = logging.getLogger(__name__)
 class GreyhoundAPIError(Exception):
     """Exception raised for errors in the Greyhound API."""
 
-
 class GreyhoundAPICommunicationError(GreyhoundAPIError):
     """Communication error with the API."""
+
+class GreyhoundSessionExpiredError(GreyhoundAPIError):
+    """Greyhound session has expired."""
 
 
 class GreyhoundApiClient:
@@ -50,9 +52,11 @@ class GreyhoundApiClient:
                     url=url,
                     headers=headers,
                     json=data,
-                ) as response:
-                    self._verify_response_or_raise(response)
-
+                    allow_redirects=False,
+                ) as response:   
+                                        
+                    self._verify_response_or_raise(response)                    
+                    
                     if return_json:
                         return await response.json()
                     return await response.text()
@@ -70,6 +74,8 @@ class GreyhoundApiClient:
     @staticmethod
     def _verify_response_or_raise(response: ClientResponse) -> None:
         """Verify HTTP response or raise error."""
+        if response.status in (301, 302, 303, 307, 308):
+            raise GreyhoundSessionExpiredError(f"Unexpected redirect: {response.headers.get('Location')}")
         if response.status >= 400:
             raise GreyhoundAPIError(f"HTTP error: {response.status}")
 
@@ -129,7 +135,16 @@ class GreyhoundApiClient:
         if not self.logged_in:
             await self.login()
 
-        calendar_text = await self._api_wrapper("GET", CALENDAR_URL, return_json=False)
+        try:
+            calendar_text = await self._api_wrapper("GET", CALENDAR_URL, return_json=False)
+            
+        except GreyhoundSessionExpiredError:
+            _LOGGER.info("Greyhound session expired, logging in again")
+
+            self.logged_in = False
+            await self.login()
+
+            calendar_text = await self._api_wrapper("GET", CALENDAR_URL, return_json=False) 
 
         # Extract embedded JS data with regex
         match = re.search(r'var data = "(.*?)getJSONData', calendar_text, re.DOTALL)
